@@ -17,7 +17,7 @@ function task_stockFileCheck() {
     var sheet = SpreadsheetApp.openById(file.getId())
     var lastDate = new Date(sheet.getRange('A2').getValue().replace(/年|月/g, '-').replace(/日/g, ''))
     if(lastDate.getDate() != today.getDate()){
-      var failMsg = fileName + ' stops at ' + (lastDate.getMonth()+1) + '/' + lastDate.getDate()
+      var failMsg = fileName + ' stoped at ' + (lastDate.getMonth()+1) + '/' + lastDate.getDate()
       latestDateWrongLst.push(failMsg)
     }
   }
