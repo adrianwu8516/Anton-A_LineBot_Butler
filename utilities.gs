@@ -33,63 +33,6 @@ function cleanStringFormatResult(txt){
   return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
 }
 
-function pusher(message) {
-  var url = 'https://api.line.me/v2/bot/message/push';
-  UrlFetchApp.fetch(url, {
-    'headers': {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-    },
-    'method': 'post',
-    'payload': JSON.stringify({
-      'to':  LINE_USER_ID,
-      'messages': [{
-        type:'text',
-        text:message
-      }]
-    }),
-  });  
-}
-
-function replier(replyToken, replyMessage){
-  var url = 'https://api.line.me/v2/bot/message/reply';
-  UrlFetchApp.fetch(url, {
-      'headers': {
-      'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
-    },
-    'method': 'post',
-    'payload': JSON.stringify({
-      'replyToken': replyToken,
-      'messages': [{
-        'type': 'text',
-        'text': replyMessage,
-      }],
-    }),
-  });
-}
-
-function doPost(e) {
-  var msg = JSON.parse(e.postData.contents);
-
-  // 取出 replayToken 和發送的訊息文字
-  var replyToken = msg.events[0].replyToken;
-  if (typeof replyToken === 'undefined') return;
-  
-  var userId = msg.events[0].source.userId;
-  var userMessage = msg.events[0].message.text;
-  
-  if(userId != LINE_USER_ID){
-    replier(replyToken, "Sorry, you have no permission to do this")
-  }else{
-    if(userMessage.match(/MC/)){
-      remoteMissionControl(userMessage, replyToken)
-    }else{
-      replier(replyToken, "Don't Know what you mean, sir!")
-    }
-  }
-}
-
 
 SPECIFICCLOSEDAY = ['2020-1-2', '2020-1-21', '2020-2-18', '2020-4-11', '2020-5-26', '2020-7-4', '2020-9-8', '2020-11-27', '2020-12-26']
 
