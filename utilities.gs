@@ -2,6 +2,17 @@ function truncate(str, n){
   return (str.length > n) ? str.substr(0, n-1) + '...' : str;
 };
 
+function formatDate(date) {
+  var hours = date.getHours();
+  var minutes = date.getMinutes();
+  var ampm = hours >= 12 ? 'pm' : 'am';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0'+minutes : minutes;
+  var strTime = hours + ':' + minutes + ' ' + ampm;
+  return (date.getMonth()+1) + "/" + date.getDate() + " " + strTime; //+ "/" + date.getFullYear() + 
+}
+
 function pusher(message) {
   var CHANNEL_ACCESS_TOKEN = BOT_TOKEN;
   var url = 'https://api.line.me/v2/bot/message/push';
@@ -27,9 +38,20 @@ function doPost(e) {
 
   // 取出 replayToken 和發送的訊息文字
   var replyToken = msg.events[0].replyToken;
-  var userMessage = msg.events[0].message.text;
-
   if (typeof replyToken === 'undefined') return;
+  
+  var userId = msg.events[0].source.userId;
+  var userMessage = msg.events[0].message.text;
+  
+  if(userId != LINE_USER_ID){
+    var replyMessage = 'Sorry, you have no permission to do this'
+  }else{
+    if(userMessage.match(/MC/)){
+      var replyMessage = remoteMissionControl(userMessage)
+    }else{
+      var replyMessage = "Don't Know what you mean, sir!"
+    }
+  }
 
   var url = 'https://api.line.me/v2/bot/message/reply';
   UrlFetchApp.fetch(url, {
@@ -42,7 +64,7 @@ function doPost(e) {
       'replyToken': replyToken,
       'messages': [{
         'type': 'text',
-        'text': userMessage+' ( auto reply )',
+        'text': replyMessage,
       }],
     }),
   });

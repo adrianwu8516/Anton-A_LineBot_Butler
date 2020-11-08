@@ -6,6 +6,7 @@ function task_stockFileCheck() {
   var today = new Date()
   
   var fileNotUpdatedLst = [], latestDateWrongLst = []
+  
   while (files.hasNext()) {
     var file = files.next()
     var fileName = file.getName()
@@ -22,11 +23,21 @@ function task_stockFileCheck() {
     }
   }
   
-  var notUpdatedMsg = truncate(("File Not Updated: " + fileNotUpdatedLst.toString().replace(/,/g, '\n')), 1000)
-  var lastDayWrongMsg = truncate(("Last Date Wrong:\n" + latestDateWrongLst.toString().replace(/,/g, '\n')), 1000)
-  Logger.log(notUpdatedMsg)
-  Logger.log(lastDayWrongMsg)
-  pusher(notUpdatedMsg)
-  pusher(lastDayWrongMsg)
+  if(fileNotUpdatedLst.length != 0 ){
+    var notUpdatedMsg = truncate(("File Not Updated: " + fileNotUpdatedLst.toString().replace(/,/g, '\n')), 1000)
+    Logger.log(notUpdatedMsg)
+    pusher(notUpdatedMsg)
+  }else{
+    pusher("All files are updated today!")
+  }
+  
+  if(latestDateWrongLst.length != 0 ){
+    var lastDayWrongMsg = truncate(("Last Date Wrong:\n" + latestDateWrongLst.toString().replace(/,/g, '\n')), 1000)
+    Logger.log(lastDayWrongMsg)
+    pusher(lastDayWrongMsg)
+  }else{
+    pusher("All files are correct!")
+  }
+  
   Logger.log("File Iter Ended!")
 }
