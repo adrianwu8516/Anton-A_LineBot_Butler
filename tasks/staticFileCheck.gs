@@ -1,4 +1,4 @@
-function task_staticFileCheck() {
+function task_staticFileCheck(){
   // Check if market closed
   if(!checkifClosed()) return;
   

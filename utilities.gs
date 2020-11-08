@@ -13,8 +13,27 @@ function formatDate(date) {
   return (date.getMonth()+1) + "/" + date.getDate() + " " + strTime; //+ "/" + date.getFullYear() + 
 }
 
+String.prototype.format = function ()
+{
+    var txt = this.toString();
+    for (var i = 0; i < arguments.length; i++)
+    {
+        var exp = getStringFormatPlaceHolderRegEx(i);
+        txt = txt.replace(exp, (arguments[i] == null ? "" : arguments[i]));
+    }
+    return cleanStringFormatResult(txt);
+}
+
+function getStringFormatPlaceHolderRegEx(placeHolderIndex){
+  return new RegExp('({)?\\{' + placeHolderIndex + '\\}(?!})', 'gm')
+}
+
+function cleanStringFormatResult(txt){
+  if (txt == null) return "";
+  return txt.replace(getStringFormatPlaceHolderRegEx("\\d+"), "");
+}
+
 function pusher(message) {
-  var CHANNEL_ACCESS_TOKEN = BOT_TOKEN;
   var url = 'https://api.line.me/v2/bot/message/push';
   UrlFetchApp.fetch(url, {
     'headers': {
@@ -32,27 +51,7 @@ function pusher(message) {
   });  
 }
 
-function doPost(e) {
-  var CHANNEL_ACCESS_TOKEN = BOT_TOKEN
-  var msg = JSON.parse(e.postData.contents);
-
-  // 取出 replayToken 和發送的訊息文字
-  var replyToken = msg.events[0].replyToken;
-  if (typeof replyToken === 'undefined') return;
-  
-  var userId = msg.events[0].source.userId;
-  var userMessage = msg.events[0].message.text;
-  
-  if(userId != LINE_USER_ID){
-    var replyMessage = 'Sorry, you have no permission to do this'
-  }else{
-    if(userMessage.match(/MC/)){
-      var replyMessage = remoteMissionControl(userMessage)
-    }else{
-      var replyMessage = "Don't Know what you mean, sir!"
-    }
-  }
-
+function replier(replyToken, replyMessage){
   var url = 'https://api.line.me/v2/bot/message/reply';
   UrlFetchApp.fetch(url, {
       'headers': {
@@ -68,6 +67,27 @@ function doPost(e) {
       }],
     }),
   });
+}
+
+function doPost(e) {
+  var msg = JSON.parse(e.postData.contents);
+
+  // 取出 replayToken 和發送的訊息文字
+  var replyToken = msg.events[0].replyToken;
+  if (typeof replyToken === 'undefined') return;
+  
+  var userId = msg.events[0].source.userId;
+  var userMessage = msg.events[0].message.text;
+  
+  if(userId != LINE_USER_ID){
+    replier(replyToken, "Sorry, you have no permission to do this")
+  }else{
+    if(userMessage.match(/MC/)){
+      remoteMissionControl(userMessage, replyToken)
+    }else{
+      replier(replyToken, "Don't Know what you mean, sir!")
+    }
+  }
 }
 
 

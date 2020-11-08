@@ -1,4 +1,4 @@
-function remoteMissionControl(userMessage) {
+function remoteMissionControl(userMessage, replyToken) {
   userMessage = userMessage.replace('MC', '')
   const baseUrl = 'https://script.google.com/macros/s/AKfycbwHqrLyBUTz6YrfDgL10LCOKoaLozcJsdg8ClPmUTLJG-HyOfc/exec?mode=missionControl&task='
   if(userMessage.match("parser")){
@@ -16,8 +16,10 @@ function remoteMissionControl(userMessage) {
   }else if(userMessage.match("fix")){
     var url = baseUrl + 'fixMissingValueInSheet'
   }else{
-    return 'Mission control cannot identify the order'
+    replier(replyToken, 'Mission control cannot identify the order')
+    return 
   }
+  replier(replyToken, "On My Way, Sir")
   UrlFetchApp.fetch(url)
-  return "On My Way, Sir"
+  return 
 }
