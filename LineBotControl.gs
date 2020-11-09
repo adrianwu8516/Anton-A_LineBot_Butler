@@ -34,7 +34,7 @@ function replier(replyToken, replyMessage){
   });
 }
 
-function replyMenu(replyToken){
+function parserMenu(replyToken){
   var url = 'https://api.line.me/v2/bot/message/reply';
   UrlFetchApp.fetch(url, {
       'headers': {
@@ -46,35 +46,79 @@ function replyMenu(replyToken){
       'replyToken': replyToken,
       'messages': [{
         "type": "template",
-        "altText": "This is a buttons template",
+        "altText": "This is a menu for mission control",
         "template": {
           "type": "buttons",
-          "thumbnailImageUrl": "https://example.com/bot/images/image.jpg",
-          "imageAspectRatio": "rectangle",
+          "thumbnailImageUrl": "https://2.bp.blogspot.com/-H2eLSLfzvpA/XGjx1UapC6I/AAAAAAABRcA/5Xdh-W7tqk8X1YONndv2B1ykhJ6BRS1bgCLcBGAs/s800/ai_computer_sousa_robot.png",
+          "imageAspectRatio": "square",
           "imageSize": "cover",
           "imageBackgroundColor": "#FFFFFF",
-          "title": "Menu",
-          "text": "Please select",
-          "defaultAction": {
-            "type": "uri",
-            "label": "View detail",
-            "uri": "http://example.com/page/123"
-          },
+          "title": "Mission Control",
+          "text": "You can remote control the parser and cache service here！",
           "actions": [
             {
-              "type": "postback",
-              "label": "Buy",
-              "data": "action=buy&itemid=123"
+              "type":"message",
+              "label":"PARSER_PACKAGE",
+              "text":"MCparser"
             },
             {
-              "type": "postback",
-              "label": "Add to cart",
-              "data": "action=add&itemid=123"
+              "type":"message",
+              "label":"RECORDER_PACKAGE",
+              "text":"MCparserR"
             },
             {
-              "type": "uri",
-              "label": "View detail",
-              "uri": "http://example.com/page/123"
+              "type":"message",
+              "label":"GuruFocus",
+              "text":"MCguru"
+            },
+            {
+              "type":"message",
+              "label":"GuruFocusRecord",
+              "text":"MCguruR"
+            }
+          ]
+        }
+      }],
+    }),
+  });
+}
+
+function logMenu(replyToken){
+  var url = 'https://api.line.me/v2/bot/message/reply';
+  UrlFetchApp.fetch(url, {
+      'headers': {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer ' + CHANNEL_ACCESS_TOKEN,
+    },
+    'method': 'post',
+    'payload': JSON.stringify({
+      'replyToken': replyToken,
+      'messages': [{
+        "type": "template",
+        "altText": "This is a menu for mission control",
+        "template": {
+          "type": "buttons",
+          "thumbnailImageUrl": "https://1.bp.blogspot.com/-QgQV1hHADHQ/V0QnaOZIQnI/AAAAAAAA64c/YYew-pIBHd8V3Wb0l8xGDWs1PF9eUoq0QCLcB/s400/computer_mukashi_.png",
+          "imageAspectRatio": "square",
+          "imageSize": "cover",
+          "imageBackgroundColor": "#FFFFFF",
+          "title": "Log Control",
+          "text": "You can remote control the parser and cache service here！",
+          "actions": [
+            {
+              "type":"message",
+              "label":"REGENERATELOG",
+              "text":"MCrefresh"
+            },
+            {
+              "type":"message",
+              "label":"genCrossDateLog",
+              "text":"MCcrossLog"
+            },
+            {
+              "type":"message",
+              "label":"fixMissingValue",
+              "text":"MCfix"
             }
           ]
         }
@@ -98,8 +142,10 @@ function doPost(e) {
   }else{
     if(userMessage.match(/MC/)){
       remoteMissionControl(userMessage, replyToken)
-    }else if(userMessage.match(/MENU|menu|Menu/)){
-      replyMenu(replyToken)
+    }else if(userMessage.match(/parser|Parser/)){
+      parserMenu(replyToken)
+    }else if(userMessage.match(/log|Log/)){
+      logMenu(replyToken)
     }else{
       replier(replyToken, "Don't Know what you mean, sir!")
     }
