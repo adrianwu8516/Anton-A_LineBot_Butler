@@ -38,7 +38,9 @@ SPECIFICCLOSEDAY = ['2020-1-2', '2020-1-21', '2020-2-18', '2020-4-11', '2020-5-2
 
 //Stop if the market is closed!
 function checkifClosed(){
-  var today = new Date();
+  var today = new Date(); // GMT -8
+  today.setHours(today.getHours() + 16); // to GMT+8
+  Logger.log(today)
   if(today.getDay() < 2){Logger.log("Market Closed!");return;}
   var todayString = today.getFullYear() + '-' + (today.getMonth()+1) + '-' + today.getDate()
   if(SPECIFICCLOSEDAY.includes(todayString)){Logger.log("Holiday!");return;}

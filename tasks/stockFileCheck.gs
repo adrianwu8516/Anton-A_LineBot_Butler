@@ -4,7 +4,8 @@ function task_stockFileCheck() {
   
   var files = DriveApp.getFolderById(STOCK_FILE_ID).getFiles()
   var today = new Date()
-  
+  today.setHours(today.getHours() + 16)
+
   var fileNotUpdatedLst = [], latestDateWrongLst = []
   
   while (files.hasNext()) {
@@ -12,8 +13,9 @@ function task_stockFileCheck() {
     var fileName = file.getName()
     Logger.log(fileName)
     
-    var lastUpdate = file.getLastUpdated()
-    if(lastUpdate.getDate() != today.getDate()) fileNotUpdatedLst.push(fileName)
+    var updatedTime = file.getLastUpdated() // US Time
+    updatedTime.setHours(updatedTime.getHours() + 16) // TW Time
+    if(updatedTime.getDate() != today.getDate()) fileNotUpdatedLst.push(fileName)
 
     var sheet = SpreadsheetApp.openById(file.getId())
     var lastDate = new Date(sheet.getRange('A2').getValue().replace(/年|月/g, '-').replace(/日/g, ''))
