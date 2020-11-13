@@ -15,11 +15,13 @@ function remoteMissionControl(userMessage, replyToken) {
     var url = baseUrl + 'genCrossDateLog'
   }else if(userMessage.match("fix")){
     var url = baseUrl + 'fixMissingValueInSheet'
+  }else if(userMessage.match("etf")){
+    var url = baseUrl + 'collectETFData'
   }else{
     replier(replyToken, 'Mission control cannot identify the order')
     return 
   }
-  replier(replyToken, "On My Way, Sir")
+  replier(replyToken, "On My Way, Sir!\nWill call the API:\n" + url)
   UrlFetchApp.fetch(url)
   return 
 }

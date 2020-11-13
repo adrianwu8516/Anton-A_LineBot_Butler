@@ -1,3 +1,30 @@
+function doPost(e) {
+  var msg = JSON.parse(e.postData.contents);
+
+  // 取出 replayToken 和發送的訊息文字
+  var replyToken = msg.events[0].replyToken;
+  if (typeof replyToken === 'undefined') return;
+  
+  var userId = msg.events[0].source.userId;
+  var userMessage = msg.events[0].message.text;
+  
+  if(userId != LINE_USER_ID){
+    replier(replyToken, "Sorry, you have no permission to do this")
+  }else{
+    if(userMessage.match(/RUN/)){
+      remoteMissionControl(userMessage, replyToken)
+    }else if(userMessage.match(/GET/)){
+      urlParseMission(userMessage, replyToken)
+    }else if(userMessage.match(/parser|Parser/)){
+      parserMenu(replyToken)
+    }else if(userMessage.match(/log|Log/)){
+      logMenu(replyToken)
+    }else{
+      replier(replyToken, "Don't Know what you mean, sir!")
+    }
+  }
+}
+
 function pusher(message) {
   var url = 'https://api.line.me/v2/bot/message/push';
   UrlFetchApp.fetch(url, {
@@ -59,22 +86,22 @@ function parserMenu(replyToken){
             {
               "type":"message",
               "label":"PARSER_PACKAGE",
-              "text":"MCparser"
+              "text":"RUN parser"
             },
             {
               "type":"message",
               "label":"RECORDER_PACKAGE",
-              "text":"MCparserR"
+              "text":"RUN parserR"
             },
             {
               "type":"message",
               "label":"GuruFocus",
-              "text":"MCguru"
+              "text":"RUN guru"
             },
             {
               "type":"message",
               "label":"GuruFocusRecord",
-              "text":"MCguruR"
+              "text":"RUN guruR"
             }
           ]
         }
@@ -108,46 +135,26 @@ function logMenu(replyToken){
             {
               "type":"message",
               "label":"REGENERATELOG",
-              "text":"MCrefresh"
+              "text":"RUN refresh"
             },
             {
               "type":"message",
               "label":"genCrossDateLog",
-              "text":"MCcrossLog"
+              "text":"RUN crossLog"
             },
             {
               "type":"message",
               "label":"fixMissingValue",
-              "text":"MCfix"
+              "text":"RUN fix"
+            },
+            {
+              "type":"uri",
+              "label":"View Site",
+              "uri":"https://sites.google.com/view/us-stock-today/home"
             }
           ]
         }
       }],
     }),
   });
-}
-
-function doPost(e) {
-  var msg = JSON.parse(e.postData.contents);
-
-  // 取出 replayToken 和發送的訊息文字
-  var replyToken = msg.events[0].replyToken;
-  if (typeof replyToken === 'undefined') return;
-  
-  var userId = msg.events[0].source.userId;
-  var userMessage = msg.events[0].message.text;
-  
-  if(userId != LINE_USER_ID){
-    replier(replyToken, "Sorry, you have no permission to do this")
-  }else{
-    if(userMessage.match(/MC/)){
-      remoteMissionControl(userMessage, replyToken)
-    }else if(userMessage.match(/parser|Parser/)){
-      parserMenu(replyToken)
-    }else if(userMessage.match(/log|Log/)){
-      logMenu(replyToken)
-    }else{
-      replier(replyToken, "Don't Know what you mean, sir!")
-    }
-  }
 }
