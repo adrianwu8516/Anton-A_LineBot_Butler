@@ -1,12 +1,14 @@
 function pttPotentialStockParser() {
   let postObj = {};
+  let replyStr = "昨日PTT熱門標的：\n"
   const baseUrl = 'https://www.ptt.cc/';
   let targetUrl = 'bbs/Stock/index.html';
   
   // Set Time Control
-  let latestDate = new Date();
+  let latestDate = new Date() // GMT-8
+  latestDate.setHours(latestDate.getHours() + 16); // to GMT+8
   const thisYear = latestDate.getFullYear()
-  const endDate = new Date().setDate(latestDate.getDate()-2); // Only fetch the lasest data within 2 days
+  const endDate = new Date().setDate(latestDate.getDate()-1); // Only fetch the lasest data within 2 days
   
   while(latestDate > endDate){
     let xml = UrlFetchApp.fetch(baseUrl + targetUrl).getContentText();
@@ -15,23 +17,24 @@ function pttPotentialStockParser() {
     for(let no in titleLst){
       let postUrl = titleLst[no].replace(/<div class="title">[\s]*?<a href="([\s\S]*?)">([\s\S]*?)<\/a>[\s\S]*?<div class="date">([\s\S]*?)<\/div>/, '$1')
       let title = titleLst[no].replace(/<div class="title">[\s]*?<a href="([\s\S]*?)">([\s\S]*?)<\/a>[\s\S]*?<div class="date">([\s\S]*?)<\/div>/, '$2')
+      
       //Fetch created date of each post, so that we can tell when should we stop crawling
       let date = titleLst[no].replace(/<div class="title">[\s]*?<a href="([\s\S]*?)">([\s\S]*?)<\/a>[\s\S]*?<div class="date">([\s\S]*?)<\/div>/, '$3') 
+
       postObj[postUrl] = {title: title, date:date}
-      Logger.log(postObj[postUrl])
+      //Logger.log(postObj[postUrl])
       
       // Pass 置底公告 and 閒聊區
-      if(title.includes('公告') || title.includes('閒聊')) continue;
+      if(title.includes('公告') || title.includes('閒聊') || title.includes('行事曆')) continue;
       
       // The "latestDate" showes that any data before this date has been processed
       latestDate = Date.parse(thisYear + '/' + date)
     }
   }
   
-  let mailObj = {}
-  
   for(let postUrl in postObj){
     let postDetail = postObj[postUrl]
+    
     // If this is a "標的文" then start further analyzation
     if(postDetail.title.includes('標的')){
       let postContent = UrlFetchApp.fetch(baseUrl + postUrl).getContentText();
@@ -42,15 +45,10 @@ function pttPotentialStockParser() {
         if(commentLst[commentNo].includes('低調')) potentialScore += 1
       }
       // Set Mail Content
-      mailObj[postUrl] = postObj[postUrl]
-      mailObj[postUrl].score = potentialScore
+      let str = "【{1}】{0}\n".format(postObj[postUrl].title.replace(/\[標的\]|Re: /g, ''), potentialScore)
+      replyStr = replyStr + str
     }
   }
-  Logger.log(mailObj)
-  let replyStr = "昨日PTT熱門標的：\n"
-  for(var item in mailObj){
-    let str = "{0}：熱度{1}\n".format(mailObj[item].title, mailObj[item].score)
-    replyStr = replyStr + str
-  }
-  Logger.log(replyStr)
+  replyStr = replyStr + '\nCheck it yourself:\nhttps://www.ptt.cc/bbs/Stock/index.html'
+  pusher(replyStr)
 }
