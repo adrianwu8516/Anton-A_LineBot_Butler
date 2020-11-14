@@ -77,6 +77,7 @@ function jobAlert_MeetJobs(){
     if(!lst) return
     for(let no in lst){
       if(index.includes(lst[no].id)) continue;
+      if(lst[no].title.includes(/Developer|developer|Engineer|engineer/)) continue;
       sheet.insertRowAfter(2);
       sheet.getRange('A3:J3').setValues([[
         lst[no].id, 
