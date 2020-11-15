@@ -50,5 +50,5 @@ function pttPotentialStockParser() {
     }
   }
   replyStr = replyStr + '\nCheck it yourself:\nhttps://www.ptt.cc/bbs/Stock/index.html'
-  pusher(replyStr)
+  if(replyStr != "昨日PTT熱門標的：\n") pusher(replyStr)
 }

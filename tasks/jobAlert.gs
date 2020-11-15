@@ -60,7 +60,7 @@ function jobAlert_CakeResume() {
     pageNo += 1 
   }
   Logger.log(replyStr)
-  pusher(replyStr)
+  if(replyStr != "CakeResume中，發現高薪工作：\n") pusher(replyStr)
 }
 
 
@@ -103,5 +103,5 @@ function jobAlert_MeetJobs(){
     pageNo += 1
   }
   Logger.log(replyStr)
-  pusher(replyStr)
+  if(replyStr != "MeetJobs中，發現高薪工作：\n") pusher(replyStr)
 }
